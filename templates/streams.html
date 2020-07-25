@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>ログストリーム一覧</h1>
+
+<h2>LogGroupName: {{ data.log_group_name }}</h2>
+
+<div class="row">
+<div class="col">
+<div class="alert alert-light" role="alert">
+このページから検索を行うとロググループ全体が対象となります。
+この場合、期間を明示しないとおそらくタイムアウトしてしまいます。
+</div>
+</div>
+</div>
+
+{% include "search_form.html" %}
+
+<hr>
+
+{% if data.more_streams %}
+<div class="row">
+<div class="col-md-12">
+<div class="alert alert-secondary" role="alert">
+もっと多くの logStream が存在しますが、LastEventTimestamp の新しいものから{{ data.max_streams }}件を表示しています。
+</div>
+</div>
+</div>
+{% endif %}
+
+<div class="row">
+<div class="col-md-12">
+<ul>
+{% for stream in data.log_streams %}
+  <li><a href="{{ url_for('search', group=data.log_group_name, stream=stream.name) }}"><span class="mono">{{ stream.name }}</span></a> <span class="mono">(Last Event Timestamp: {{ stream.last_event_timestamp }})</span></li>
+{% endfor %}
+</ul>
+</div>
+</div>
+
+{% endblock %}

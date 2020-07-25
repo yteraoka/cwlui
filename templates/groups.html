@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>ロググループ一覧</h1>
+
+<div class="col-md-12">
+<code>LOG_GROUP_PATTERNS</code> 環境変数にカンマ区切りで正規表現を並べてアクセス可能なロググループを制限することができます。
+</div>
+
+<div class="col-md-12 my-2">
+
+<ul>
+{% for item in data.log_groups %}
+  <li><a href="{{ url_for('streams', group=item) }}"><span class="mono">{{ item }}</span></a></li>
+{% endfor %}
+</ul>
+
+</div>
+
+{% endblock %}

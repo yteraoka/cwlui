@@ -1,0 +1,73 @@
+<div>
+
+<form method="GET" action="{{ url_for('search') }}">
+<input type="hidden" name="group" value="{{ data.log_group_name }}">
+{% for stream in data.streams %}
+<input type="hidden" name="stream" value="{{ stream }}">
+{% endfor %}
+
+<div class="form-row col-md-12">
+  <div class="form-group col-md-2">
+    <label for="start_time">StartTime (Local Timezone)</label>
+    <input type="text" class="form-control" id="start_time" name="start_time" value="{{ data.start_time }}">
+  </div>
+  <div class="form-group col-md-2">
+    <label for="end_time">EndTime (Local Timezone)</label>
+    <input type="text" class="form-control" id="end_time" name="end_time" value="{{ data.end_time }}">
+  </div>
+  <div class="col-md-6">
+    <br>
+    <button type="button" class="btn btn-info" id="last_1_hour">Last 1 hour</button>
+    <button type="button" class="btn btn-info" id="last_3_hour">Last 3 hours</button>
+    <button type="button" class="btn btn-info" id="last_6_hour">Last 6 hours</button>
+    <button type="button" class="btn btn-info" id="last_12_hour">Last 12 hours</button>
+    <button type="button" class="btn btn-info" id="last_24_hour">Last 24 hours</button>
+  </div>
+</div>
+
+<div class="form-row col-md-12">
+  <div class="form-group col-md-12">
+    <label for="filter_pattern">Search Query</label> (<a data-toggle="collapse" href="#filter_pattern_docs" role="button" aria-expanded="false" aria-controls="filter_pattern_docs">書き方</a>)
+    <input type="text" class="form-control" name="filter_pattern" style="width: 80%" value="{{ data.filter_pattern }}">
+    <small id="filterPatternHelp" class="form-text text-muted">例: 「<code>{$.kubernetes.container_name = "nginx" &amp;&amp; $.data.uri != "/health" &amp;&amp; $.data.status != "200"}</code>」、「<code>555b0e29bb2a3d260f8b1fbc601397f1</code>」(request id の値) <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html">Filter and Pattern Syntax</a></small>
+  </div>
+</div>
+
+<div class="form-row col-md-12">
+  <div class="col-md-10 collapse" id="filter_pattern_docs">
+    <div class="card card-body mb-2">
+JSON のログに対しては次のようなクエリが可能です (&amp;&amp; と || が使えます)
+<pre class="border my-1 p-2">
+{$.kubernetes.container_name = nginx &amp;&amp; $.data.uri != "/health" &amp;&amp; $.data.status != "200"}
+</pre>
+field の存在を条件にする場合は
+<pre class="border my-1 p-2">
+{$.data.authority = *}
+</pre>
+文字列比較の = と != では * で部分一致にも使えます
+<pre class="border my-1 p-2">
+{$.kubernetes.namespace_name = kube-*}
+</pre>
+数値の場合は =, !=, &lt;, &gt;, &lt;=, &gt;= が使えますが、クオートされた field は文字列となり使えません
+<pre class="border my-1 p-2">
+{ $.latency &gt;= 500 }
+{ $.numbers[0] &lt; 10e3 }
+{ $.numbers[0] &lt; 10e-3 }
+{ $.processes[4].averageRuntime &lt;= 55.5 }
+{ $.errorCode = 400 }
+{ $.errorCode != 500 }
+{ $.latency &gt; +1000 }
+</pre>
+    </div>
+  </div>
+</div>
+
+<div class="form-row col-md-12">
+  <div class="form-group col-md-10">
+    <button type="submit" class="btn btn-primary">Search</button>
+  </div>
+</div>
+
+</form>
+
+</div>

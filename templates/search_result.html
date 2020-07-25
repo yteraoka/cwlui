@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>LogGroupName: <a href="{{ url_for('streams', group=data.log_group_name) }}">{{ data.log_group_name }}</a></h2>
+
+{% if data.streams|length > 0 %}
+<h3>LogStreams</h3>
+
+<ul>
+{% for stream in data.streams %}
+<li>{{ stream }}</li>
+{% endfor %}
+</ul>
+{% else %}
+<p>ロググループ全体が対象</p>
+{% endif %}
+
+{% include "search_form.html" %}
+
+<hr>
+
+<h3>検索結果</h3>
+
+<div>
+検索対象期間: {% if data.start_time or data.end_time %}{{ data.start_time }} 〜 {{ data.end_time }}{% else %}なし{% endif %}<br>
+クエリ: {{ data.filter_pattern }}<br>
+経過時間: {{ '%.2f' % data.duration }} 秒<br>
+{% if data.message %}
+<div class="alert alert-danger" role="alert">
+  {{ data.message }}
+</div>
+{% else %}
+レコード数: {{ data.num_events }}
+{% endif %}
+</div>
+
+{% if data.next_token %}
+<form method="GET" action="{{ url_for('search') }}">
+<input type="hidden" name="group" value="{{ data.log_group_name }}">
+{% for stream in data.streams %}
+<input type="hidden" name="stream" value="{{ stream }}">
+{% endfor %}
+<input type="hidden" name="start_time" value="{{ data.start_time }}">
+<input type="hidden" name="end_time" value="{{ data.end_time }}">
+<input type="hidden" name="filter_pattern" value="{{ data.filter_pattern }}">
+<input type="hidden" name="next_token" value="{{ data.next_token }}">
+<button type="submit" class="btn btn-primary my-1">Next</button>
+</form>
+{% endif %}
+
+<pre class="search-result">
+{% for event in data.events %}
+<span class="event-set">{{ event.timestamp }} <span class="event" id="{{ event.event_id }}" data-timestamp="{{ event.timestamp }}">{{ event.message -}}</span></span>
+{%- endfor %}
+</pre>
+
+{% if data.next_token %}
+<form method="GET" action="{{ url_for('search') }}">
+<input type="hidden" name="group" value="{{ data.log_group_name }}">
+{% for stream in data.streams %}
+<input type="hidden" name="stream" value="{{ stream }}">
+{% endfor %}
+<input type="hidden" name="start_time" value="{{ data.start_time }}">
+<input type="hidden" name="end_time" value="{{ data.end_time }}">
+<input type="hidden" name="filter_pattern" value="{{ data.filter_pattern }}">
+<input type="hidden" name="next_token" value="{{ data.next_token }}">
+<button type="submit" class="btn btn-primary my-1">Next</button>
+</form>
+{% endif %}
+
+{% endblock %}
