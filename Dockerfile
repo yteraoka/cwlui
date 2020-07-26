@@ -11,4 +11,4 @@ USER app
 
 EXPOSE 8000
 
-CMD gunicorn -w 4 -b 0.0.0.0:8000 --log-level=info --access-logfile=- cwlui:app
+CMD gunicorn -w 4 -b 0.0.0.0:8000 --log-level=info --access-logfile=- --limit-request-line=8192 cwlui:app
