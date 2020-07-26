@@ -14,6 +14,7 @@ import logging
 
 VERSION = '0.0.1'
 
+SEARCH_TIMEOUT = int(os.environ.get('SEARCH_TIMEOUT')) if os.environ.get('SEARCH_TIMEOUT') is not None else 60
 LOG_STREAMS_MAX = int(os.environ.get('LOG_STREAMS_MAX')) if os.environ.get('LOG_STREAMS_MAX') is not None else 200
 MAX_EVENTS = int(os.environ.get('MAX_EVENTS')) if os.environ.get('MAX_EVENTS') is not None else 4000
 PAGE_SIZE = int(os.environ.get('PAGE_SIZE')) if os.environ.get('PAGE_SIZE') is not None else 1000
@@ -94,7 +95,7 @@ def datetime_to_timestamp(timestr):
     return result
 
 
-@timeout(25, use_signals=False)
+@timeout(SEARCH_TIMEOUT, use_signals=False)
 def filter_events(group, streams=[], stream_prefix=None, start_time=None, end_time=None, filter_pattern=None, token=None):
     request = {
             'logGroupName': group,
