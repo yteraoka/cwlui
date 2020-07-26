@@ -15,7 +15,7 @@ import logging
 VERSION = '0.0.1'
 
 LOG_STREAMS_MAX = int(os.environ.get('LOG_STREAMS_MAX')) if os.environ.get('LOG_STREAMS_MAX') is not None else 200
-MAX_EVENTS = int(os.environ.get('MAX_EVENTS')) if os.environ.get('MAX_EVENTS') is not None else 2000
+MAX_EVENTS = int(os.environ.get('MAX_EVENTS')) if os.environ.get('MAX_EVENTS') is not None else 4000
 PAGE_SIZE = int(os.environ.get('PAGE_SIZE')) if os.environ.get('PAGE_SIZE') is not None else 1000
 
 LOG_GROUP_PATTERNS = []
@@ -103,6 +103,7 @@ def filter_events(group, streams=[], stream_prefix=None, start_time=None, end_ti
                 'PageSize': PAGE_SIZE
             }
     }
+
     if len(streams) > 0:
         request['logStreamNames'] = streams
     if stream_prefix:
@@ -114,10 +115,7 @@ def filter_events(group, streams=[], stream_prefix=None, start_time=None, end_ti
     if filter_pattern:
         request['filterPattern'] = filter_pattern
     if token:
-        if 'PaginationConfig' in request:
-            request['PaginationConfig'] = {'StartingToken': token}
-        else:
-            request['PaginationConfig']['StartingToken'] = token
+        request['PaginationConfig']['StartingToken'] = token
 
     app.logger.info(request)
 
@@ -135,10 +133,10 @@ def filter_events(group, streams=[], stream_prefix=None, start_time=None, end_ti
                     'stream': event['logStreamName'],
                     'event_id': event['eventId']
                 })
-        if 'nextToken' in page:
-            next_token = page['nextToken']
-            if len(events) > 500:
-                break
+        if 'searchedLogStreams' in page:
+            for stream in page['searchedLogStreams']:
+                app.logger.debug("searched {}: {}".format(stream['logStreamName'], stream['searchedCompletely']))
+        next_token = page['nextToken'] if 'nextToken' in page else None
 
     return events, next_token
 
