@@ -186,6 +186,9 @@ def search():
     filter_pattern = request.args.get('filter_pattern')
     message = None
 
+    if not is_accessible_group(log_group_name):
+        return render_template("error.html", e='許可されていない logGroup です'), 403
+
     t_start = time.time()
 
     try:
