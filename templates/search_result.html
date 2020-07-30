@@ -24,6 +24,9 @@
 <div>
 検索対象期間: {% if data.start_time or data.end_time %}{{ data.start_time }} 〜 {{ data.end_time }}{% else %}なし{% endif %}<br>
 クエリ: {{ data.filter_pattern }}<br>
+{% if data.fields|length > 0 %}
+表示フィールド: {{ data.fields }}<br>
+{% endif %}
 経過時間: {{ '%.2f' % data.duration }} 秒<br>
 {% if data.message %}
 <div class="alert alert-danger" role="alert">
@@ -43,6 +46,7 @@
 <input type="hidden" name="start_time" value="{{ data.start_time }}">
 <input type="hidden" name="end_time" value="{{ data.end_time }}">
 <input type="hidden" name="filter_pattern" value="{{ data.filter_pattern }}">
+<input type="hidden" name="fields" value="{{ data.fields }}">
 <input type="hidden" name="next_token" value="{{ data.next_token }}">
 <button type="submit" class="btn btn-primary my-1">Next</button> (続きがあります)
 </form>
@@ -50,7 +54,7 @@
 
 <pre class="search-result">
 {% for event in data.events %}
-<span class="event-set">{{ event.timestamp }} <span class="event" id="{{ event.event_id }}" data-timestamp="{{ event.timestamp }}">{{ event.message -}}</span></span>
+<span class="event-set" data-timestamp="{{ event.timestamp }}" data-log="{{ event.message }}">{{ event.timestamp }} {% if event.fields|length > 0 %}{% for field in event.fields %}<span>{{ field }}</span>{% if not loop.last %} {% endif %}{% endfor %}{% else %}<span class="event" id="{{ event.event_id }}" data-timestamp="{{ event.timestamp }}">{{ event.message -}}</span>{% endif %}</span>
 {%- endfor %}
 </pre>
 
@@ -63,6 +67,7 @@
 <input type="hidden" name="start_time" value="{{ data.start_time }}">
 <input type="hidden" name="end_time" value="{{ data.end_time }}">
 <input type="hidden" name="filter_pattern" value="{{ data.filter_pattern }}">
+<input type="hidden" name="fields" value="{{ data.fields }}">
 <input type="hidden" name="next_token" value="{{ data.next_token }}">
 <button type="submit" class="btn btn-primary my-1">Next</button> (続きがあります)
 </form>

@@ -131,11 +131,12 @@ $( function() {
   $('#start_time').datetimepicker();
   $('#end_time').datetimepicker();
 });
-$('.event').on('click', function(){
+$('.event-set').on('click', function(){
   event.stopPropagation();
   event.stopImmediatePropagation();
-  console.log($(this).data('timestamp'));
-  $('#log').replaceWith('<pre id="log">' + $(this).data('timestamp') + "\n\n" + JSON.stringify(JSON.parse($(this).html()), null, 4) + '</pre>');
+  console.log($(this).data('log'));
+  console.log($(this).data('log').toString());
+  $('#log').replaceWith('<pre id="log">' + $(this).data('timestamp') + "\n\n" + JSON.stringify($(this).data('log'), null, 4) + '</pre>');
   $('#log-viewer').show();
 });
 $('.modal-close').on('click', function(){

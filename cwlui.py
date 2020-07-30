@@ -11,6 +11,8 @@ from werkzeug.exceptions import HTTPException
 import os
 import re
 import logging
+import json
+from jsonpath_ng import jsonpath, parse
 
 VERSION = '0.0.3'
 
@@ -96,7 +98,7 @@ def datetime_to_timestamp(timestr):
 
 
 @timeout(SEARCH_TIMEOUT, use_signals=False)
-def filter_events(group, streams=[], stream_prefix=None, start_time=None, end_time=None, filter_pattern=None, token=None):
+def filter_events(group, streams=[], fields=[], stream_prefix=None, start_time=None, end_time=None, filter_pattern=None, token=None):
     request = {
             'logGroupName': group,
             'PaginationConfig': {
@@ -120,6 +122,10 @@ def filter_events(group, streams=[], stream_prefix=None, start_time=None, end_ti
 
     app.logger.info(request)
 
+    jsonpath_exps = []
+    for field in fields:
+        jsonpath_exps.append(parse(field))
+
     events = []
     next_token = None
 
@@ -127,13 +133,25 @@ def filter_events(group, streams=[], stream_prefix=None, start_time=None, end_ti
     for page in paginator.paginate(**request):
         if 'events' in page:
             for event in page['events']:
-                events.append({
+                log = {
                     'message': event['message'],
                     'timestamp': timestamp_to_str(event['timestamp']),
                     'ingestion_time': timestamp_to_str(event['ingestionTime']),
                     'stream': event['logStreamName'],
-                    'event_id': event['eventId']
-                })
+                    'event_id': event['eventId'],
+                    'fields': []
+                }
+                try:
+                    j = json.loads(event['message'])
+                    for exp in jsonpath_exps:
+                        match = exp.find(j)
+                        if isinstance(match[0].value, str):
+                            log['fields'].append(match[0].value)
+                        else:
+                            log['fields'].append(json.dumps(match[0].value))
+                except Exception as e:
+                    app.logger.debug(e)
+                events.append(log)
         if 'searchedLogStreams' in page:
             for stream in page['searchedLogStreams']:
                 app.logger.debug("searched {}: {}".format(stream['logStreamName'], stream['searchedCompletely']))
@@ -180,6 +198,7 @@ def streams():
 def search():
     log_group_name = request.args.get('group')
     streams = [s for s in request.args.getlist('stream') if s != '']
+    fields = [s.strip() for s in request.args.get('fields').split(',') if s.strip() != ''] if request.args.get('fields') is not None else []
     start_time = datetime_to_timestamp(request.args.get('start_time'))
     end_time = datetime_to_timestamp(request.args.get('end_time'))
     next_token = request.args.get('next_token')
@@ -194,7 +213,8 @@ def search():
     try:
         events, next_token = filter_events(group=log_group_name, streams=streams,
                 start_time=start_time, end_time=end_time,
-                filter_pattern=filter_pattern, token=next_token)
+                filter_pattern=filter_pattern, token=next_token,
+                fields=fields)
     except TimeoutError:
         app.logger.error("TimeoutError")
         events = []
@@ -210,6 +230,7 @@ def search():
                 'start_time': request.args.get('start_time') if (start_time) else '' ,
                 'end_time': request.args.get('end_time') if (end_time) else '',
                 'filter_pattern': filter_pattern if (filter_pattern) else '',
+                'fields': ', '.join(fields),
                 'duration': duration,
                 'message': message
                 })

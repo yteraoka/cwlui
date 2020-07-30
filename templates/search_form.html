@@ -64,6 +64,14 @@ field の存在を条件にする場合は
 
 <div class="form-row col-md-12">
   <div class="form-group col-md-10">
+    <label for="filter_pattern">Fields</label> (comma separated)
+    <input type="text" class="form-control" name="fields" style="width: 80%" value="{{ data.fields }}">
+    <small id="filterPatternHelp" class="form-text text-muted">例: <code>$.kubernetes.container_name,$.data</code></small>
+  </div>
+</div>
+
+<div class="form-row col-md-12">
+  <div class="form-group col-md-10">
     <button type="submit" class="btn btn-primary">Search</button>
   </div>
 </div>
