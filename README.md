@@ -12,6 +12,7 @@
 - 環境変数でアクセス可能なロググループを制限
 - logGroup 全体、もしくは logStream に対して filter pattern と期間を指定しての検索
 - 表示されたログをクリックで JSON は modal で見やすく表示
+- 一覧表示の項目を jsonpath 形式で指定可能
 
 ログ取得の paging 処理
 
@@ -22,8 +23,9 @@ https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/logs.
 
 ### TODO
 
-- 表示 field の制御
+- ~~表示 field の制御~~
 - モダンな UI
+- 複数の logStream を明示して検索
 
 ## Docker
 
