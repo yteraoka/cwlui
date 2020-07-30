@@ -1,6 +1,6 @@
 # CloudWatch Logs Viewer
 
-様々な理由により CloudWatch Logs の Web console にアクセス出来ない環境むけのサーバー
+様々な理由により CloudWatch Logs の Web console にアクセス出来ない環境(あるいはセッション切れが早くて鬱陶しい場合)向けのサーバー
 
 - Python 3.8
 - Flask
@@ -12,6 +12,8 @@
 ### Search result
 
 <img src="https://user-images.githubusercontent.com/52259/88941488-08209f00-d2c4-11ea-9393-992b12950ca2.png" width="480px">
+
+一覧に表示する項目を指定することができます (Insights ではない通常の CloudWatch Logs UI ではできない)
 
 ### Search result show a log in modal
 
