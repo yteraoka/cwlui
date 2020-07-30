@@ -128,8 +128,8 @@ function formatDate(date, format) {
 function setLastNHours(n) {
   let now = new Date();
   let start = new Date(now - n * 3600 * 1000);
-  $('#end_time').val([formatDate(now, 'yyyy/MM/dd HH:mm')]);
-  $('#start_time').val([formatDate(start, 'yyyy/MM/dd HH:mm')]);
+  $('#end_time').val([formatDate(now, 'yyyy/MM/dd HH:mm:ss')]);
+  $('#start_time').val([formatDate(start, 'yyyy/MM/dd HH:mm:ss')]);
 }
 $('.event-set').on('click', function(){
   event.stopPropagation();
