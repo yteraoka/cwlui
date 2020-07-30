@@ -7,6 +7,16 @@
 - Gunicorn
 - boto3
 
+## Screenshot
+
+### Search result
+
+<img src="https://user-images.githubusercontent.com/52259/88941488-08209f00-d2c4-11ea-9393-992b12950ca2.png" width="480px">
+
+### Search result show a log in modal
+
+<img src="https://user-images.githubusercontent.com/52259/88941501-0b1b8f80-d2c4-11ea-8395-233ca2d9e86d.png" width="480px">
+
 ## 機能
 
 - 環境変数でアクセス可能なロググループを制限
