@@ -89,8 +89,10 @@ def datetime_to_timestamp(timestr):
     try:
         (date_str, time_str) = timestr.split(' ')
         (year, month, day) = date_str.split('/')
-        (hour, minute) = time_str.split(':')
-        result = datetime(int(year), int(month), int(day), hour=int(hour), minute=int(minute)).timestamp() * 1000
+        t = time_str.split(':')
+        if len(t) == 2:
+            t.append('0')
+        result = datetime(int(year), int(month), int(day), hour=int(t[0]), minute=int(t[1]), second=int(t[2])).timestamp() * 1000
     except Exception as e:
         result = None
 
