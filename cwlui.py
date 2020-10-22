@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, make_response
+from flask_cors import CORS
 from datetime import timedelta, datetime, tzinfo
 import boto3
 from botocore.exceptions import NoCredentialsError, ClientError
@@ -12,6 +13,7 @@ import os
 import re
 import logging
 import json
+import math
 from jsonpath_ng import jsonpath, parse
 
 VERSION = '0.2.1'
@@ -29,6 +31,8 @@ if os.environ.get('LOG_GROUP_PATTERNS') is not None:
 TZ = get_localzone()
 
 app = Flask(__name__.split('.')[0])
+
+CORS(app)
 
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
@@ -84,6 +88,11 @@ def timestamp_to_str(timestamp):
     return dt.isoformat(timespec='milliseconds')
 
 
+def timestamp_to_str_s(timestamp):
+    dt = datetime.fromtimestamp(timestamp//1000, TZ)
+    return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+
 def datetime_to_timestamp(timestr):
     result = None
     try:
@@ -131,18 +140,29 @@ def filter_events(group, streams=[], fields=[], stream_prefix=None, start_time=N
     events = []
     next_token = None
 
+    first_log_timestamp_ms = 0
+    last_log_timestamp_ms = 0
+
     paginator = log_client.get_paginator('filter_log_events')
     for page in paginator.paginate(**request):
         if 'events' in page:
             for event in page['events']:
+                if first_log_timestamp_ms == 0 or first_log_timestamp_ms > event['timestamp']:
+                    first_log_timestamp_ms = event['timestamp']
+
+                if last_log_timestamp_ms == 0 or last_log_timestamp_ms < event['timestamp']:
+                    last_log_timestamp_ms = event['timestamp']
+
                 log = {
                     'message': event['message'],
+                    't': event['timestamp'],
                     'timestamp': timestamp_to_str(event['timestamp']),
                     'ingestion_time': timestamp_to_str(event['ingestionTime']),
                     'stream': event['logStreamName'],
                     'event_id': event['eventId'],
                     'fields': []
                 }
+
                 try:
                     j = json.loads(event['message'])
                     for exp in jsonpath_exps:
@@ -154,12 +174,36 @@ def filter_events(group, streams=[], fields=[], stream_prefix=None, start_time=N
                 except Exception as e:
                     app.logger.debug(e)
                 events.append(log)
+
         if 'searchedLogStreams' in page:
             for stream in page['searchedLogStreams']:
                 app.logger.debug("searched {}: {}".format(stream['logStreamName'], stream['searchedCompletely']))
+
         next_token = page['nextToken'] if 'nextToken' in page else None
 
-    return events, next_token
+    time_length_ms = last_log_timestamp_ms - first_log_timestamp_ms
+
+    window_ms = 86400 * 1000
+
+    if time_length_ms < 3600 * 1000:
+        window_ms = 60 * 1000
+    elif time_length_ms < 86400 * 1000:
+        window_ms = 10 * 60 * 1000
+    elif time_length_ms < 2 * 86400 * 1000:
+        window_ms = 30 * 60 * 1000
+    elif time_length_ms < 7 * 86400 * 1000:
+        window_ms = 12 * 60 * 1000
+
+    histgram = {}
+    for event in events:
+        t = math.floor(event['t'] / window_ms) * window_ms
+        t_str = timestamp_to_str_s(t)
+        if t_str in histgram:
+            histgram[t_str] += 1
+        else:
+            histgram[t_str] = 1
+
+    return events, sorted(histgram.items(), key=lambda x:x[0]), next_token
 
 
 @app.errorhandler(NoCredentialsError)
@@ -213,7 +257,7 @@ def search():
     t_start = time.time()
 
     try:
-        events, next_token = filter_events(group=log_group_name, streams=streams,
+        events, histgram, next_token = filter_events(group=log_group_name, streams=streams,
                 start_time=start_time, end_time=end_time,
                 filter_pattern=filter_pattern, token=next_token,
                 fields=fields)
@@ -226,7 +270,7 @@ def search():
 
     num_events = len(events)
 
-    return render_template('search_result.html',
+    return make_response(render_template('search_result.html',
             data={'log_group_name': log_group_name, 'streams': streams, 'events': events, 'next_token': next_token,
                 'num_events': num_events,
                 'start_time': request.args.get('start_time') if (start_time) else '' ,
@@ -234,8 +278,9 @@ def search():
                 'filter_pattern': filter_pattern if (filter_pattern) else '',
                 'fields': ', '.join(fields),
                 'duration': duration,
-                'message': message
-                })
+                'message': message,
+                'histgram': histgram
+                }))
 
 
 @app.route('/health')
