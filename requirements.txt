@@ -6,7 +6,7 @@ docutils==0.15.2
 Flask==1.1.2
 gunicorn==20.0.4
 itsdangerous==1.1.0
-Jinja2==2.11.2
+Jinja2==2.11.3
 jmespath==0.10.0
 jsonpath-ng==1.5.1
 MarkupSafe==1.1.1
