@@ -19,3 +19,4 @@ tzdata==2022.7
 tzlocal==4.2
 urllib3==1.26.14
 Werkzeug==2.2.2
+setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
