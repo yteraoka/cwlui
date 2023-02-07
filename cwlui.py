@@ -131,10 +131,39 @@ def filter_events(group, streams=[], fields=[], stream_prefix=None, start_time=N
     events = []
     next_token = None
 
-    paginator = log_client.get_paginator('filter_log_events')
-    for page in paginator.paginate(**request):
-        if 'events' in page:
-            for event in page['events']:
+#    paginator = log_client.get_paginator('filter_log_events')
+#    for page in paginator.paginate(**request):
+#        if 'events' in page:
+#            for event in page['events']:
+#                log = {
+#                    'message': event['message'],
+#                    'timestamp': timestamp_to_str(event['timestamp']),
+#                    'ingestion_time': timestamp_to_str(event['ingestionTime']),
+#                    'stream': event['logStreamName'],
+#                    'event_id': event['eventId'],
+#                    'fields': []
+#                }
+#                try:
+#                    j = json.loads(event['message'])
+#                    for exp in jsonpath_exps:
+#                        match = exp.find(j)
+#                        if isinstance(match[0].value, str):
+#                            log['fields'].append(match[0].value)
+#                        else:
+#                            log['fields'].append(json.dumps(match[0].value))
+#                except Exception as e:
+#                    app.logger.debug(e)
+#                events.append(log)
+#        if 'searchedLogStreams' in page:
+#            for stream in page['searchedLogStreams']:
+#                app.logger.debug("searched {}: {}".format(stream['logStreamName'], stream['searchedCompletely']))
+#        next_token = page['nextToken'] if 'nextToken' in page else None
+
+    while True:
+        response = log_client.filter_log_events(**request)
+        if 'events' in response:
+            for event in response['events']:
+                app.logger.info(event)
                 log = {
                     'message': event['message'],
                     'timestamp': timestamp_to_str(event['timestamp']),
@@ -154,10 +183,10 @@ def filter_events(group, streams=[], fields=[], stream_prefix=None, start_time=N
                 except Exception as e:
                     app.logger.debug(e)
                 events.append(log)
-        if 'searchedLogStreams' in page:
-            for stream in page['searchedLogStreams']:
-                app.logger.debug("searched {}: {}".format(stream['logStreamName'], stream['searchedCompletely']))
-        next_token = page['nextToken'] if 'nextToken' in page else None
+        if 'nextToken' in response:
+            request['nextToken'] = response['nextToken']
+        else:
+            break
 
     return events, next_token
 
