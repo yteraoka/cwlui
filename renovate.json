@@ -7,6 +7,10 @@
     {
       "matchPackagePatterns": ["boto3", "botocore"],
       "groupName": "boto"
+    },
+    {
+      "matchPackagePatterns": ["flask", "Werkzeug"],
+      "groupName": "flask"
     }
   ]
 }
