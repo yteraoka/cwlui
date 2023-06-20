@@ -39,12 +39,13 @@ jobs:
           tags: cwlui:scan
 
       - name: Dockle
-        # https://github.com/erzz/dockle-action
-        uses: erzz/dockle-action@v1
+        # https://github.com/goodwithtech/dockle-action
+        uses: goodwithtech/dockle-action@main
         with:
           image: cwlui:scan
+          format: list
           exit-code: '1'
-          failure-threshold: fatal
+          exit-level: fatal
           ignore: 'CIS-DI-0010'
 
       - name: Trivy
