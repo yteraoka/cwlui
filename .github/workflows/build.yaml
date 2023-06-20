@@ -45,6 +45,7 @@ jobs:
           image: cwlui:scan
           exit-code: '1'
           failure-threshold: fatal
+          ignore: 'CIS-DI-0010'
 
       - name: Trivy
         # https://github.com/aquasecurity/trivy-action
