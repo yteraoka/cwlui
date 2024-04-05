@@ -17,6 +17,6 @@ six==1.16.0
 timeout-decorator==0.5.0
 tzdata==2023.4
 tzlocal==5.2
-urllib3==1.26.16
+urllib3==1.26.18
 setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
 Werkzeug==3.0.1
