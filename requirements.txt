@@ -20,3 +20,4 @@ tzlocal==5.2
 urllib3==1.26.16
 setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
 Werkzeug==3.0.1
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
