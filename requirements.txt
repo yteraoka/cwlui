@@ -18,5 +18,5 @@ timeout-decorator==0.5.0
 tzdata==2023.4
 tzlocal==5.2
 urllib3==1.26.16
-setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
+setuptools>=70.0.0 # not directly required, pinned by Snyk to avoid a vulnerability
 Werkzeug==3.0.1
