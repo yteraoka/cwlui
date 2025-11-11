@@ -12,7 +12,7 @@ MarkupSafe==2.1.5
 ply==3.11
 python-dateutil==2.9.0.post0
 pytz-deprecation-shim==0.1.0.post0
-s3transfer==0.11.5
+s3transfer==0.14.0
 six==1.17.0
 timeout-decorator==0.5.0
 tzdata==2023.4
