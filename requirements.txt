@@ -7,7 +7,7 @@ gunicorn==23.0.0
 itsdangerous==2.1.2
 Jinja2==3.1.6
 jmespath==1.0.1
-jsonpath-ng==1.5.3
+jsonpath-ng==1.7.0
 MarkupSafe==2.1.5
 ply==3.11
 python-dateutil==2.8.2
@@ -17,7 +17,7 @@ six==1.16.0
 timeout-decorator==0.5.0
 tzdata==2023.4
 tzlocal==5.2
-urllib3==1.26.16
+urllib3==2.5.0
 setuptools>=70.0.0 # not directly required, pinned by Snyk to avoid a vulnerability
 Werkzeug==3.0.1
 zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
