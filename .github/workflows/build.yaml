@@ -30,7 +30,7 @@ jobs:
 
       - name: Build only
         # https://github.com/docker/build-push-action
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
