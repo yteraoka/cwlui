@@ -8,7 +8,7 @@ jobs:
     name: Lint Dockerfile with hadolint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Lint Dockerfile
         # https://github.com/hadolint/hadolint-action
@@ -22,7 +22,7 @@ jobs:
     name: Build container image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Docker Buildx
         # https://github.com/docker/setup-buildx-action
