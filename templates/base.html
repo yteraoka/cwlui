@@ -131,10 +131,35 @@ function setLastNHours(n) {
   $('#end_time').val([formatDate(now, 'yyyy/MM/dd HH:mm:ss')]);
   $('#start_time').val([formatDate(start, 'yyyy/MM/dd HH:mm:ss')]);
 }
+// JSON のログは indent を付けて読みやすく整形する。JSON でなければ元のまま。
+// 「2020-01-01 INFO {...}」のように前置きがある行は JSON 部分だけ整形する。
+function prettifyLog(message) {
+  let text = message.replace(/\s+$/, '');
+  let start = text.search(/[\[{]/);
+  if (start < 0) {
+    return message;
+  }
+  let prefix = text.slice(0, start);
+  let body = text.slice(start);
+  let parsed;
+  try {
+    parsed = JSON.parse(body);
+  } catch (e) {
+    return message;
+  }
+  if (parsed === null || typeof parsed !== 'object') {
+    return message;
+  }
+  return prefix + JSON.stringify(parsed, null, 2);
+}
 $('.event-set').on('click', function(event){
   event.stopPropagation();
   event.stopImmediatePropagation();
-  $('#log').replaceWith('<div id="log">' + $(this).data('timestamp') + '<br><textarea readonly>' + JSON.stringify($(this).data('log'), null, 4) + '</textarea></div>');
+  // data() は JSON っぽい値を勝手に parse するので、生の属性値を読む
+  let message = $(this).attr('data-log');
+  let $log = $('<div id="log"></div>').text($(this).attr('data-timestamp'));
+  $log.append('<br>').append($('<textarea readonly></textarea>').val(prettifyLog(message)));
+  $('#log').replaceWith($log);
   $('#log-viewer').show();
 });
 $('.modal-close').on('click', function(){
