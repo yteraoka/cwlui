@@ -2,9 +2,33 @@
 
 <form method="GET" action="{{ url_for('search') }}">
 <input type="hidden" name="group" value="{{ data.log_group_name }}">
+{% if data.log_streams is defined %}
+<div class="form-row col-md-12">
+  <div class="form-group col-md-10">
+    <label>LogStreams</label>
+    <small class="form-text text-muted">複数選択できます。1つも選択しない場合はロググループ全体が対象になります。</small>
+    <div class="my-1">
+      <button type="button" class="btn btn-sm btn-outline-secondary" id="select_all_streams">全選択</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" id="clear_all_streams">全解除</button>
+    </div>
+    <div class="border p-2" style="max-height: 260px; overflow-y: auto;">
+    {% for stream in data.log_streams %}
+      <div class="form-check">
+        <input class="form-check-input stream-checkbox" type="checkbox" name="stream" value="{{ stream.name }}" id="stream-{{ loop.index }}"{% if stream.name in data.streams %} checked{% endif %}>
+        <label class="form-check-label mono" for="stream-{{ loop.index }}">{{ stream.name }}</label>
+        <span class="mono text-muted">(Last Event Timestamp: {{ stream.last_event_timestamp }})</span>
+      </div>
+    {% else %}
+      <span class="text-muted">logStream がありません</span>
+    {% endfor %}
+    </div>
+  </div>
+</div>
+{% else %}
 {% for stream in data.streams %}
 <input type="hidden" name="stream" value="{{ stream }}">
 {% endfor %}
+{% endif %}
 
 <div class="form-row col-md-12">
   <div class="form-group col-md-2">
