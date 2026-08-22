@@ -52,11 +52,7 @@
 </form>
 {% endif %}
 
-<pre class="search-result">
-{% for event in data.events %}
-<span class="event-set" data-timestamp="{{ event.timestamp }}" data-log="{{ event.message }}">{{ event.timestamp }} {% if event.fields|length > 0 %}{% for field in event.fields %}<span>{{ field if field != '' else '-' }}</span>{% if not loop.last %} {% endif %}{% endfor %}{% else %}<span class="event" id="{{ event.event_id }}" data-timestamp="{{ event.timestamp }}">{{ event.message -}}</span>{% endif %}</span>
-{%- endfor %}
-</pre>
+<pre class="search-result">{% for event in data.events %}<span class="event-set" data-timestamp="{{ event.timestamp }}" data-log="{{ event.message }}">{{ event.timestamp }} {% if event.fields|length > 0 %}{% for field in event.fields %}<span>{{ field if field != '' else '-' }}</span>{% if not loop.last %} {% endif %}{% endfor %}{% else %}<span class="event" id="{{ event.event_id }}" data-timestamp="{{ event.timestamp }}">{{ event.message -}}</span>{% endif %}</span>{% endfor %}</pre>
 
 {% if data.next_token %}
 <form method="GET" action="{{ url_for('search') }}">
