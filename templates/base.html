@@ -131,16 +131,20 @@ function setLastNHours(n) {
   $('#end_time').val([formatDate(now, 'yyyy/MM/dd HH:mm:ss')]);
   $('#start_time').val([formatDate(start, 'yyyy/MM/dd HH:mm:ss')]);
 }
-$('.event-set').on('click', function(){
+$('.event-set').on('click', function(event){
   event.stopPropagation();
   event.stopImmediatePropagation();
-  console.log($(this).data('log'));
-  console.log($(this).data('log').toString());
   $('#log').replaceWith('<div id="log">' + $(this).data('timestamp') + '<br><textarea readonly>' + JSON.stringify($(this).data('log'), null, 4) + '</textarea></div>');
   $('#log-viewer').show();
 });
 $('.modal-close').on('click', function(){
   $('#log-viewer').hide();
+});
+$('#select_all_streams').on('click', function(){
+  $('.stream-checkbox').prop('checked', true);
+});
+$('#clear_all_streams').on('click', function(){
+  $('.stream-checkbox').prop('checked', false);
 });
 $('#last_1_hour').on('click', function(){
   setLastNHours(1);

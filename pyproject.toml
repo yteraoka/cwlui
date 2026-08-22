@@ -1,0 +1,23 @@
+[project]
+name = "cwlui"
+version = "0.3.0"
+description = "A small web UI for browsing and searching CloudWatch Logs"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+dependencies = [
+    "boto3",
+    "Flask",
+    "gunicorn",
+    "jsonpath-ng",
+    "tzlocal",
+]
+
+[dependency-groups]
+dev = [
+    "moto[logs]>=5.1.0",
+    "pytest>=8.3.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

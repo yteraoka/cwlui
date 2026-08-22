@@ -28,14 +28,14 @@
 表示フィールド: {{ data.fields }}<br>
 {% endif %}
 経過時間: {{ '%.2f' % data.duration }} 秒<br>
-{% if data.message %}
-<div class="alert alert-danger" role="alert">
-  {{ data.message }}
-</div>
-{% else %}
 レコード数: {{ data.num_events }}
-{% endif %}
 </div>
+
+{% for message in data.messages %}
+<div class="alert {% if data.timed_out %}alert-danger{% else %}alert-warning{% endif %} my-2" role="alert">
+  {{ message }}
+</div>
+{% endfor %}
 
 {% if data.next_token %}
 <form method="GET" action="{{ url_for('search') }}">
@@ -54,7 +54,7 @@
 
 <pre class="search-result">
 {% for event in data.events %}
-<span class="event-set" data-timestamp="{{ event.timestamp }}" data-log="{{ event.message }}">{{ event.timestamp }} {% if event.fields|length > 0 %}{% for field in event.fields %}<span>{{ field }}</span>{% if not loop.last %} {% endif %}{% endfor %}{% else %}<span class="event" id="{{ event.event_id }}" data-timestamp="{{ event.timestamp }}">{{ event.message -}}</span>{% endif %}</span>
+<span class="event-set" data-timestamp="{{ event.timestamp }}" data-log="{{ event.message }}">{{ event.timestamp }} {% if event.fields|length > 0 %}{% for field in event.fields %}<span>{{ field if field != '' else '-' }}</span>{% if not loop.last %} {% endif %}{% endfor %}{% else %}<span class="event" id="{{ event.event_id }}" data-timestamp="{{ event.timestamp }}">{{ event.message -}}</span>{% endif %}</span>
 {%- endfor %}
 </pre>
 
