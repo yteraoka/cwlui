@@ -10,7 +10,7 @@ itsdangerous==2.2.0
 Jinja2==3.1.6
 jmespath==1.1.0
 jsonpath-ng==1.8.0
-MarkupSafe==3.0.3
+MarkupSafe==3.0.4
 python-dateutil==2.9.0.post0
 s3transfer==0.19.2
 six==1.17.0
